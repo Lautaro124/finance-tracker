@@ -56,7 +56,18 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
           table: "Transactions",
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
+        (payload: {
+          eventType: string;
+          new: {
+            id: unknown;
+            amount?: number;
+            category?: string;
+            type?: string;
+            date?: string;
+            user_id?: string;
+          };
+          old: { id: number };
+        }) => {
           if (payload.eventType === "INSERT") {
             setTransactions((prev) => [payload.new as Transaction, ...prev]);
           } else if (payload.eventType === "DELETE") {
@@ -84,7 +95,11 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
           schema: "public",
           table: "Categorys",
         },
-        (payload) => {
+        (payload: {
+          eventType: string;
+          new: { id: unknown; created_at?: string; Name?: string };
+          old: { id: number };
+        }) => {
           if (payload.eventType === "INSERT") {
             setCategories((prev) =>
               [...prev, payload.new as Category].sort((a, b) =>

@@ -1,8 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client.lib";
+import { formStyles } from "@/lib/styles";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
@@ -11,12 +11,12 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
+    const supabase = createClient();
 
     try {
       if (isSignUp) {
@@ -36,22 +36,35 @@ export default function AuthPage() {
         );
       } else {
         // Inicio de sesión
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) throw error;
+        if (!data?.session) {
+          throw new Error(
+            "No se pudo iniciar sesión. Por favor, inténtalo nuevamente."
+          );
+        }
 
         router.push("/");
         router.refresh();
       }
     } catch (error: unknown) {
+      console.error("Error de autenticación:", error);
+      let errorMessage = "Ocurrió un error durante la autenticación";
+
       if (error instanceof Error) {
-        setError(error.message || "Ocurrió un error durante la autenticación");
-      } else {
-        setError("Ocurrió un error durante la autenticación");
+        if (error.message.includes("Auth session missing")) {
+          errorMessage =
+            "Sesión de autenticación no encontrada. Por favor, actualiza la página e inténtalo de nuevo.";
+        } else {
+          errorMessage = error.message;
+        }
       }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -69,19 +82,16 @@ export default function AuthPage() {
           </h2>
         </div>
 
-        <div className="bg-white p-8 rounded-lg shadow">
+        <div className={formStyles.container}>
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded mb-4 text-sm">
+            <div className="bg-red-50 text-red-700 p-3 rounded mb-4 text-sm font-medium border border-red-200">
               {error}
             </div>
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="email" className={formStyles.label}>
                 Correo electrónico
               </label>
               <input
@@ -92,15 +102,12 @@ export default function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={formStyles.input}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="password" className={formStyles.label}>
                 Contraseña
               </label>
               <input
@@ -111,7 +118,7 @@ export default function AuthPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={formStyles.input}
               />
             </div>
 
@@ -135,7 +142,7 @@ export default function AuthPage() {
           <div className="mt-6">
             <button
               type="button"
-              className="w-full text-center text-sm text-blue-600 hover:text-blue-800"
+              className="w-full text-center text-sm text-blue-700 hover:text-blue-900 font-medium"
               onClick={() => setIsSignUp(!isSignUp)}
             >
               {isSignUp

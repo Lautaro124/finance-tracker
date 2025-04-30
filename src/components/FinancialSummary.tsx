@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { Transaction } from "@/lib/types";
+import { formStyles } from "@/lib/styles";
 
 interface FinancialSummaryProps {
   transactions: Transaction[];
@@ -57,31 +58,33 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
   }, [summary.categorySummary]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold mb-6">Resumen financiero</h2>
+    <div className={formStyles.container}>
+      <h2 className={formStyles.text.title}>Resumen financiero</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="p-4 rounded-lg bg-gray-50 border">
-          <p className="text-sm text-gray-500 mb-1">Balance total</p>
+        <div className="p-4 rounded-lg bg-gray-50 border border-gray-300">
+          <p className="text-sm text-gray-700 font-medium mb-1">
+            Balance total
+          </p>
           <p
             className={`text-2xl font-bold ${
-              summary.totalBalance >= 0 ? "text-green-600" : "text-red-600"
+              summary.totalBalance >= 0 ? "text-green-700" : "text-red-700"
             }`}
           >
             {formatCurrency(summary.totalBalance)}
           </p>
         </div>
 
-        <div className="p-4 rounded-lg bg-gray-50 border">
-          <p className="text-sm text-gray-500 mb-1">Ingresos</p>
-          <p className="text-2xl font-bold text-green-600">
+        <div className="p-4 rounded-lg bg-gray-50 border border-gray-300">
+          <p className="text-sm text-gray-700 font-medium mb-1">Ingresos</p>
+          <p className="text-2xl font-bold text-green-700">
             {formatCurrency(summary.totalIncome)}
           </p>
         </div>
 
-        <div className="p-4 rounded-lg bg-gray-50 border">
-          <p className="text-sm text-gray-500 mb-1">Gastos</p>
-          <p className="text-2xl font-bold text-red-600">
+        <div className="p-4 rounded-lg bg-gray-50 border border-gray-300">
+          <p className="text-sm text-gray-700 font-medium mb-1">Gastos</p>
+          <p className="text-2xl font-bold text-red-700">
             {formatCurrency(summary.totalExpense)}
           </p>
         </div>
@@ -89,24 +92,26 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
 
       {topCategories.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-4">
+          <h3 className={formStyles.text.subtitle}>
             Principales categorías de gastos
           </h3>
           <div className="space-y-3">
             {topCategories.map(([category, amount]) => (
               <div key={category} className="flex items-center">
-                <div className="w-36 truncate pr-2">{category}</div>
+                <div className="w-36 truncate pr-2 text-gray-900 font-medium">
+                  {category}
+                </div>
                 <div className="flex-1">
-                  <div className="h-7 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-7 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
                     <div
-                      className="h-full bg-blue-500 rounded-full"
+                      className="h-full bg-blue-600 rounded-full"
                       style={{
                         width: `${(amount / summary.totalExpense) * 100}%`,
                       }}
                     />
                   </div>
                 </div>
-                <div className="w-24 text-right font-medium">
+                <div className="w-24 text-right font-medium text-gray-900">
                   {formatCurrency(amount)}
                 </div>
               </div>

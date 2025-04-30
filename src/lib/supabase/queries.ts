@@ -93,18 +93,25 @@ export async function deleteTransaction(id: number, userId: string) {
 }
 
 export async function getCurrentUser() {
-  const supabase = await createSSRClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = await createSSRClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error("Error getting current user:", error);
+    if (error) {
+      console.error("Error getting current user:", error);
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Error en getCurrentUser:", error);
+    // Si ocurre un AuthSessionMissingError, devuelve null para
+    // permitir que la aplicación redirija al usuario a la página de inicio de sesión
     return null;
   }
-
-  return user;
 }
 
 export async function formatCurrency(amount: number): Promise<string> {

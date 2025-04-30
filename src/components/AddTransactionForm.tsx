@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Category, Transaction, TransactionType } from "@/lib/types";
+import { formStyles } from "@/lib/styles";
 
 interface AddTransactionFormProps {
   categories: Category[];
@@ -72,8 +73,8 @@ export function AddTransactionForm({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-bold mb-4">Agregar transacción</h2>
+    <div className={formStyles.container}>
+      <h2 className={formStyles.text.title}>Agregar transacción</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex gap-4 mb-4">
@@ -81,8 +82,8 @@ export function AddTransactionForm({
             type="button"
             className={`flex-1 py-2 px-4 rounded-md ${
               type === TransactionType.EXPENSE
-                ? "bg-red-500 text-white"
-                : "bg-gray-100 text-gray-700"
+                ? "bg-red-600 text-white font-medium"
+                : "bg-gray-200 text-gray-800 font-medium"
             }`}
             onClick={() => setType(TransactionType.EXPENSE)}
           >
@@ -92,8 +93,8 @@ export function AddTransactionForm({
             type="button"
             className={`flex-1 py-2 px-4 rounded-md ${
               type === TransactionType.INCOME
-                ? "bg-green-500 text-white"
-                : "bg-gray-100 text-gray-700"
+                ? "bg-green-600 text-white font-medium"
+                : "bg-gray-200 text-gray-800 font-medium"
             }`}
             onClick={() => setType(TransactionType.INCOME)}
           >
@@ -103,14 +104,12 @@ export function AddTransactionForm({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Monto (ARS)
-            </label>
+            <label className={formStyles.label}>Monto (ARS)</label>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={formStyles.input}
               placeholder="0"
               min="0"
               step="0.01"
@@ -121,12 +120,10 @@ export function AddTransactionForm({
           {!showAddCategory ? (
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  Categoría
-                </label>
+                <label className={formStyles.label}>Categoría</label>
                 <button
                   type="button"
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-blue-700 hover:text-blue-900 font-medium"
                   onClick={() => setShowAddCategory(true)}
                 >
                   + Nueva categoría
@@ -135,7 +132,7 @@ export function AddTransactionForm({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={formStyles.select}
                 required
               >
                 <option value="">Seleccionar categoría</option>
@@ -148,28 +145,26 @@ export function AddTransactionForm({
             </div>
           ) : (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nueva categoría
-              </label>
+              <label className={formStyles.label}>Nueva categoría</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="flex-1 px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={formStyles.input}
                   placeholder="Nombre de la categoría"
                 />
                 <button
                   type="button"
                   onClick={handleAddCategory}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                  className={formStyles.button.primary}
                 >
                   Agregar
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddCategory(false)}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
+                  className={formStyles.button.secondary}
                 >
                   Cancelar
                 </button>
@@ -178,14 +173,12 @@ export function AddTransactionForm({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fecha
-            </label>
+            <label className={formStyles.label}>Fecha</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={formStyles.input}
               required
             />
           </div>
@@ -194,7 +187,7 @@ export function AddTransactionForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 ${
+          className={`w-full ${formStyles.button.primary} ${
             isSubmitting ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
