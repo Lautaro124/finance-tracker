@@ -13,9 +13,8 @@ import {
   BarElement,
   Title,
 } from "chart.js";
-import { Pie, Bar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
-// Registrar los componentes necesarios de Chart.js
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -136,25 +135,6 @@ export function FinancialCharts({ transactions }: FinancialChartsProps) {
     };
   }, [transactions]);
 
-  const pieOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "bottom" as const,
-        labels: {
-          padding: 20,
-        },
-      },
-      title: {
-        display: true,
-        text: "Distribución de gastos por categoría",
-        font: {
-          size: 16,
-        },
-      },
-    },
-  };
-
   const barOptions = {
     responsive: true,
     plugins: {
@@ -176,53 +156,12 @@ export function FinancialCharts({ transactions }: FinancialChartsProps) {
     },
   };
 
-  // Formatear moneda
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  // Obtener las 5 categorías principales de gastos
-  const topCategories = useMemo(() => {
-    return Object.entries(chartData.totalByCategory)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-  }, [chartData.totalByCategory]);
-
   return (
     <div className={formStyles.container}>
       <h2 className={formStyles.text.title}>Gráficos financieros</h2>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Gráfico circular de categorías de gastos */}
-        <div>
-          <div className="h-64">
-            <Pie data={chartData.pieData} options={pieOptions} />
-          </div>
-
-          <div className="mt-4">
-            <h3 className="text-sm font-medium text-gray-800 mb-2">
-              Top 5 categorías de gastos
-            </h3>
-            <div className="space-y-1">
-              {topCategories.map(([category, amount]) => (
-                <div key={category} className="flex justify-between text-sm">
-                  <span className="font-medium">{category}</span>
-                  <span>{formatCurrency(amount)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Gráfico de barras de ingresos vs gastos por mes */}
-        <div>
-          <div className="h-64">
-            <Bar data={chartData.barData} options={barOptions} />
-          </div>
+      <div>
+        <div className="h-64">
+          <Bar data={chartData.barData} options={barOptions} />
         </div>
       </div>
     </div>

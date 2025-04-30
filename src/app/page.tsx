@@ -6,7 +6,6 @@ export default async function Home() {
   const user = await getCurrentUser();
 
   if (!user) {
-    // Si no hay usuario autenticado, redirige a la página de login
     return redirect("/auth");
   }
 

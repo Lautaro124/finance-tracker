@@ -205,21 +205,20 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6 relative">
-        
-              {/* Sección de gráficos financieros */}
-              <FinancialCharts transactions={transactions} />
+      {/* Sección de gráficos financieros */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-6">
           <FinancialSummary transactions={transactions} />
         </div>
         <div className="lg:col-span-5">
-          <TransactionsList
-            transactions={transactions}
-            categories={categories}
-            onDeleteTransaction={handleDeleteTransaction}
-          />
+          <FinancialCharts transactions={transactions} />
         </div>
       </div>
+      <TransactionsList
+        transactions={transactions}
+        categories={categories}
+        onDeleteTransaction={handleDeleteTransaction}
+      />
 
       {/* Botón flotante para agregar transacción */}
       <button

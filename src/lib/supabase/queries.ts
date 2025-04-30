@@ -20,10 +20,20 @@ export async function getUserTransactions(
   userId: string
 ): Promise<Transaction[]> {
   const supabase = await createSSRClient();
+
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const startDate = firstDay.toISOString().split("T")[0];
+  const endDate = lastDay.toISOString().split("T")[0];
+
   const { data, error } = await supabase
     .from("Transactions")
     .select("*")
     .eq("user_id", userId)
+    .gte("date", startDate)
+    .lte("date", endDate)
     .order("date", { ascending: false });
 
   if (error) {
