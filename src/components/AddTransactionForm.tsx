@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Category, Transaction, TransactionType } from "@/lib/types";
+import { useState, useMemo } from "react";
+import {
+  Category,
+  Transaction,
+  TransactionType,
+  TypeRecord,
+} from "@/lib/types";
 import { formStyles } from "@/lib/styles";
 
 interface AddTransactionFormProps {
   categories: Category[];
+  types: TypeRecord[];
   onAddTransaction: (transaction: Omit<Transaction, "id">) => Promise<void>;
-  onAddCategory: (name: string) => Promise<Category | null>;
+  onAddCategory: (name: string, type: string) => Promise<Category | null>;
   userId: string;
 }
 
@@ -24,6 +30,13 @@ export function AddTransactionForm({
   const [newCategory, setNewCategory] = useState("");
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const filteredCategories = useMemo(
+    () =>
+      categories.filter((cat) => cat.Type === type),
+    [categories, type]
+  );
+      
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,12 +77,18 @@ export function AddTransactionForm({
 
     if (!newCategory) return;
 
-    const category = await onAddCategory(newCategory);
+    const category = await onAddCategory(newCategory, type);
     if (category) {
       setCategory(category.Name);
       setNewCategory("");
       setShowAddCategory(false);
     }
+  };
+
+  // Al cambiar el tipo, resetear la categoría seleccionada
+  const handleTypeChange = (newType: TransactionType) => {
+    setType(newType);
+    setCategory(""); // Reset la categoría cuando cambia el tipo
   };
 
   return (
@@ -82,7 +101,7 @@ export function AddTransactionForm({
               ? "bg-red-600 text-white font-medium"
               : "bg-gray-200 text-gray-800 font-medium"
           }`}
-          onClick={() => setType(TransactionType.EXPENSE)}
+          onClick={() => handleTypeChange(TransactionType.EXPENSE)}
         >
           Gasto
         </button>
@@ -93,7 +112,7 @@ export function AddTransactionForm({
               ? "bg-green-600 text-white font-medium"
               : "bg-gray-200 text-gray-800 font-medium"
           }`}
-          onClick={() => setType(TransactionType.INCOME)}
+          onClick={() => handleTypeChange(TransactionType.INCOME)}
         >
           Ingreso
         </button>
@@ -117,7 +136,10 @@ export function AddTransactionForm({
         {!showAddCategory ? (
           <div>
             <div className="flex justify-between items-center mb-1">
-              <label className={formStyles.label}>Categoría</label>
+              <label className={formStyles.label}>
+                Categoría de{" "}
+                {type === TransactionType.INCOME ? "Ingreso" : "Gasto"}
+              </label>
               <button
                 type="button"
                 className="text-sm text-blue-700 hover:text-blue-900 font-medium"
@@ -133,23 +155,35 @@ export function AddTransactionForm({
               required
             >
               <option value="">Seleccionar categoría</option>
-              {categories.map((cat) => (
+              {filteredCategories.map((cat) => (
                 <option key={cat.id} value={cat.Name}>
                   {cat.Name}
                 </option>
               ))}
             </select>
+            {filteredCategories.length === 0 && (
+              <p className="mt-1 text-sm text-amber-600">
+                No hay categorías de{" "}
+                {type === TransactionType.INCOME ? "ingreso" : "gasto"}{" "}
+                disponibles. Agrega una nueva categoría.
+              </p>
+            )}
           </div>
         ) : (
           <div>
-            <label className={formStyles.label}>Nueva categoría</label>
+            <label className={formStyles.label}>
+              Nueva categoría de{" "}
+              {type === TransactionType.INCOME ? "Ingreso" : "Gasto"}
+            </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
                 className={formStyles.input}
-                placeholder="Nombre de la categoría"
+                placeholder={`Nombre de la categoría de ${
+                  type === TransactionType.INCOME ? "ingreso" : "gasto"
+                }`}
               />
               <button
                 type="button"

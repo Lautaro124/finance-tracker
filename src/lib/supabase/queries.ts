@@ -1,5 +1,5 @@
 import { createSSRClient } from "./server.lib";
-import { Category, Transaction } from "../types";
+import { Category, Transaction, TypeRecord } from "../types";
 
 export async function getCategories(): Promise<Category[]> {
   const supabase = await createSSRClient();
@@ -10,6 +10,18 @@ export async function getCategories(): Promise<Category[]> {
 
   if (error) {
     console.error("Error fetching categories:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function getTypes(): Promise<TypeRecord[]> {
+  const supabase = await createSSRClient();
+  const { data, error } = await supabase.from("Types").select("*");
+
+  if (error) {
+    console.error("Error fetching types:", error);
     return [];
   }
 
@@ -66,7 +78,10 @@ export async function addTransaction(transaction: Omit<Transaction, "id">) {
   return data;
 }
 
-export async function addCategory(categoryName: string) {
+export async function addCategory(
+  categoryName: string,
+  typeName: string = "expense"
+) {
   const supabase = await createSSRClient();
 
   // Verificar que el nombre de la categoría no esté vacío
@@ -74,18 +89,36 @@ export async function addCategory(categoryName: string) {
     throw new Error("El nombre de la categoría no puede estar vacío");
   }
 
-  const { data, error } = await supabase
-    .from("Categorys")
-    .insert({ Name: categoryName })
-    .select()
-    .single();
+  try {
+    // Primero, obtener el ID del tipo basado en su nombre
+    const { data: typeData, error: typeError } = await supabase
+      .from("Types")
+      .select("id")
+      .eq("name", typeName)
+      .single();
 
-  if (error) {
-    console.error("Error adding category:", error);
-    throw new Error(error.message);
+    if (typeError || !typeData) {
+      console.error("Error getting type ID:", typeError || "No type found");
+      throw new Error(`No se encontró el tipo "${typeName}"`);
+    }
+
+    // Ahora insertar la categoría con el ID de tipo correcto
+    const { data, error } = await supabase
+      .from("Categorys")
+      .insert({ Name: categoryName, Type: typeData.id })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error adding category:", error);
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in addCategory:", error);
+    throw error;
   }
-
-  return data;
 }
 
 export async function deleteTransaction(id: number, userId: string) {

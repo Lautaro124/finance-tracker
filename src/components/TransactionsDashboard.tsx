@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Transaction, Category } from "@/lib/types";
+import {
+  Transaction,
+  Category,
+  TransactionType,
+} from "@/lib/types";
 import { createClient } from "@/lib/supabase/client.lib";
 import { FinancialSummary } from "./FinancialSummary";
 import { AddTransactionForm } from "./AddTransactionForm";
@@ -16,36 +20,38 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const supabase = createClient();
 
-  useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-      try {
-        // Cargar categorías
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from("Categorys")
+  // Función para cargar datos desde la base de datos
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      // Cargar categorías
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from("Categorys")
+        .select("*")
+        .order("Name");
+
+      if (categoriesError) throw categoriesError;
+      setCategories(categoriesData || []);
+
+      // Cargar transacciones
+      const { data: transactionsData, error: transactionsError } =
+        await supabase
+          .from("Transactions")
           .select("*")
-          .order("Name");
+          .eq("user_id", userId)
+          .order("date", { ascending: false });
 
-        if (categoriesError) throw categoriesError;
-        setCategories(categoriesData || []);
-
-        // Cargar transacciones
-        const { data: transactionsData, error: transactionsError } =
-          await supabase
-            .from("Transactions")
-            .select("*")
-            .eq("user_id", userId)
-            .order("date", { ascending: false });
-
-        if (transactionsError) throw transactionsError;
-        setTransactions(transactionsData || []);
-      } catch (error) {
-        console.error("Error cargando datos:", error);
-      } finally {
-        setIsLoading(false);
-      }
+      if (transactionsError) throw transactionsError;
+      setTransactions(transactionsData || []);
+    } catch (error) {
+      console.error("Error cargando datos:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
+    // Carga inicial de datos
     loadData();
 
     // Suscribirse a cambios en la tabla de transacciones
@@ -100,7 +106,12 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
         },
         (payload: {
           eventType: string;
-          new: { id: unknown; created_at?: string; Name?: string };
+          new: {
+            id: unknown;
+            created_at?: string;
+            Name?: string;
+            Type?: number;
+          };
           old: { id: number };
         }) => {
           if (payload.eventType === "INSERT") {
@@ -126,10 +137,29 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
       )
       .subscribe();
 
+    // Suscribirse a cambios en la tabla de tipos
+    const typesSubscription = supabase
+      .channel("types-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Types",
+        },
+        () => {
+          // Refrescar tipos si hay cambios
+          loadData();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(transactionsSubscription);
       supabase.removeChannel(categoriesSubscription);
+      supabase.removeChannel(typesSubscription);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, supabase]);
 
   const handleAddTransaction = async (transaction: Omit<Transaction, "id">) => {
@@ -140,6 +170,9 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
 
       // Cerrar el modal después de agregar exitosamente
       setIsModalOpen(false);
+
+      // Recargar datos para asegurar que todo esté actualizado
+      await loadData();
     } catch (error) {
       console.error("Error al agregar transacción:", error);
       alert("Error al agregar la transacción. Por favor, intenta nuevamente.");
@@ -154,13 +187,17 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
         .eq("id", id);
 
       if (error) throw error;
+      loadData();
     } catch (error) {
       console.error("Error al eliminar transacción:", error);
       alert("Error al eliminar la transacción. Por favor, intenta nuevamente.");
     }
   };
 
-  const handleAddCategory = async (name: string) => {
+  const handleAddCategory = async (
+    name: string,
+    typeName: string = TransactionType.EXPENSE
+  ) => {
     try {
       // Validar que el nombre de la categoría no esté vacío
       if (!name || name.trim() === "") {
@@ -169,7 +206,7 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
 
       const { data, error } = await supabase
         .from("Categorys")
-        .insert({ Name: name })
+        .insert({ Name: name, Type: typeName })
         .select()
         .single();
 

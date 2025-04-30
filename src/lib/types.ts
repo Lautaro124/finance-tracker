@@ -2,6 +2,7 @@ export type Category = {
   id: number;
   created_at: string;
   Name: string;
+  Type: string; // ID que referencia a un registro en la tabla Types
 };
 
 export type Transaction = {
@@ -18,6 +19,12 @@ export type TransactionWithCategory = Transaction & {
 };
 
 export enum TransactionType {
-  INCOME = "income",
-  EXPENSE = "expense",
+  INCOME = "Ingreso",
+  EXPENSE = "Gasto",
 }
+
+// Tipo para representar los registros de la tabla Types
+export type TypeRecord = {
+  id: number;
+  name: string; // Nombre del tipo (probablemente "income" o "expense")
+};
