@@ -6,11 +6,14 @@ import { createClient } from "@/lib/supabase/client.lib";
 import { FinancialSummary } from "./FinancialSummary";
 import { AddTransactionForm } from "./AddTransactionForm";
 import { TransactionsList } from "./TransactionsList";
+import { FinancialCharts } from "./FinancialCharts";
+import { Modal } from "./Modal";
 
 export function TransactionsDashboard({ userId }: { userId: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -134,6 +137,9 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
       const { error } = await supabase.from("Transactions").insert(transaction);
 
       if (error) throw error;
+
+      // Cerrar el modal después de agregar exitosamente
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Error al agregar transacción:", error);
       alert("Error al agregar la transacción. Por favor, intenta nuevamente.");
@@ -198,23 +204,58 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div className="lg:col-span-7 space-y-6">
-        <FinancialSummary transactions={transactions} />
+    <div className="space-y-6 relative">
+        
+              {/* Sección de gráficos financieros */}
+              <FinancialCharts transactions={transactions} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 space-y-6">
+          <FinancialSummary transactions={transactions} />
+        </div>
+        <div className="lg:col-span-5">
+          <TransactionsList
+            transactions={transactions}
+            categories={categories}
+            onDeleteTransaction={handleDeleteTransaction}
+          />
+        </div>
+      </div>
+
+      {/* Botón flotante para agregar transacción */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg z-40"
+        aria-label="Agregar nueva transacción"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-8 w-8"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          />
+        </svg>
+      </button>
+
+      {/* Modal para agregar transacción */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Agregar Nueva Transacción"
+      >
         <AddTransactionForm
           categories={categories}
           onAddTransaction={handleAddTransaction}
           onAddCategory={handleAddCategory}
           userId={userId}
         />
-      </div>
-      <div className="lg:col-span-5">
-        <TransactionsList
-          transactions={transactions}
-          categories={categories}
-          onDeleteTransaction={handleDeleteTransaction}
-        />
-      </div>
+      </Modal>
     </div>
   );
 }
