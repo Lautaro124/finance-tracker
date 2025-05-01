@@ -41,7 +41,7 @@ export default function Header({ user }: { user: User }) {
                 </button>
               </div>
               {isMenuOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 border border-gray-300">
+                <div className="origin-top-right absolute right-0 mt-2 w-48 md:w-fit rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 border border-gray-300">
                   <div className="px-4 py-2 text-sm text-gray-900 border-b border-gray-300">
                     {user.email}
                   </div>

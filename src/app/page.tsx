@@ -11,9 +11,6 @@ export default async function Home() {
 
   return (
     <main className="container mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8 text-center text-black">
-        Control de Finanzas Personales
-      </h1>
       <TransactionsDashboard userId={user.id} />
     </main>
   );
