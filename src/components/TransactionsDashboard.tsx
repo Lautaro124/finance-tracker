@@ -116,7 +116,7 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
         }) => {
           if (payload.eventType === "INSERT") {
             setCategories((prev) =>
-              [...prev, payload.new as Category].sort((a, b) =>
+              [...prev, payload.new as unknown as Category].sort((a, b) =>
                 a.Name.localeCompare(b.Name)
               )
             );
@@ -128,7 +128,7 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
             setCategories((prev) =>
               prev
                 .map((c) =>
-                  c.id === payload.new.id ? (payload.new as Category) : c
+                  c.id === payload.new.id ? (payload.new as unknown as Category) : c
                 )
                 .sort((a, b) => a.Name.localeCompare(b.Name))
             );

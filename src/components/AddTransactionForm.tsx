@@ -1,17 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Category,
-  Transaction,
-  TransactionType,
-  TypeRecord,
-} from "@/lib/types";
+import { Category, Transaction, TransactionType } from "@/lib/types";
 import { formStyles } from "@/lib/styles";
 
 interface AddTransactionFormProps {
   categories: Category[];
-  types: TypeRecord[];
   onAddTransaction: (transaction: Omit<Transaction, "id">) => Promise<void>;
   onAddCategory: (name: string, type: string) => Promise<Category | null>;
   userId: string;
@@ -32,11 +26,9 @@ export function AddTransactionForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const filteredCategories = useMemo(
-    () =>
-      categories.filter((cat) => cat.Type === type),
+    () => categories.filter((cat) => cat.Type === type),
     [categories, type]
   );
-      
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
