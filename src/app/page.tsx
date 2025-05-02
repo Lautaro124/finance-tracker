@@ -1,4 +1,4 @@
-import { TransactionsDashboard } from "@/components/TransactionsDashboard";
+import { TransactionsDashboard } from "@/components/TransactionalDashboard/TransactionsDashboard";
 import { getCurrentUser } from "@/lib/supabase/queries";
 import { redirect } from "next/navigation";
 

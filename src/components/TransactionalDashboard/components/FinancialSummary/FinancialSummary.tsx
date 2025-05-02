@@ -58,7 +58,7 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
   }, [summary.categorySummary]);
 
   return (
-    <div className={formStyles.container}>
+    <div className={`${formStyles.container} h-full`}>
       <h2 className={formStyles.text.title}>Resumen financiero</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -91,11 +91,11 @@ export function FinancialSummary({ transactions }: FinancialSummaryProps) {
       </div>
 
       {topCategories.length > 0 && (
-        <div>
+        <div className="w-full h-full">
           <h3 className={formStyles.text.subtitle}>
             Principales categorías de gastos
           </h3>
-          <div className="space-y-3">
+          <div className="overflow-y-auto max-h-28 space-y-3">
             {topCategories.map(([category, amount]) => (
               <div key={category} className="flex items-center">
                 <div className="w-36 truncate pr-2 text-gray-900 font-medium">

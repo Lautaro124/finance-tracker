@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { getCurrentUser } from "@/lib/supabase/queries";
-import Header from "@/components/Header";
+import Header from "@/components/Header/Header";
 
 export const metadata: Metadata = {
   title: "Control de Finanzas Personales",

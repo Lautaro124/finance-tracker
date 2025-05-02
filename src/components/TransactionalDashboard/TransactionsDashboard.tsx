@@ -1,17 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Transaction,
-  Category,
-  TransactionType,
-} from "@/lib/types";
+import { Transaction, Category, TransactionType } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client.lib";
-import { FinancialSummary } from "./FinancialSummary";
-import { AddTransactionForm } from "./AddTransactionForm";
-import { TransactionsList } from "./TransactionsList";
-import { FinancialCharts } from "./FinancialCharts";
-import { Modal } from "./Modal";
+import { FinancialSummary } from "./components/FinancialSummary/FinancialSummary";
+import { AddTransactionForm } from "../AddTansactionsForm/AddTransactionForm";
+import { TransactionsList } from "./components/TransactionList/TransactionsList";
+import { FinancialCharts } from "./components/FinancialCharts/FinancialCharts";
+import { Modal } from "../Modal/Modal";
 
 export function TransactionsDashboard({ userId }: { userId: string }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -128,7 +124,9 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
             setCategories((prev) =>
               prev
                 .map((c) =>
-                  c.id === payload.new.id ? (payload.new as unknown as Category) : c
+                  c.id === payload.new.id
+                    ? (payload.new as unknown as Category)
+                    : c
                 )
                 .sort((a, b) => a.Name.localeCompare(b.Name))
             );
@@ -242,13 +240,15 @@ export function TransactionsDashboard({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-6 relative">
-      {/* Sección de gráficos financieros */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-7 space-y-6">
+        <div className="lg:col-span-7 space-y-5">
           <FinancialSummary transactions={transactions} />
         </div>
         <div className="lg:col-span-5">
-          <FinancialCharts transactions={transactions} />
+          <FinancialCharts
+            transactions={transactions}
+            categories={categories}
+          />
         </div>
       </div>
       <TransactionsList

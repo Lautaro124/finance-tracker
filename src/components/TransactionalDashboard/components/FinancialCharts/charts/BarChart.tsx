@@ -1,8 +1,6 @@
 "use client";
-
-import { useMemo } from "react";
 import { Transaction } from "@/lib/types";
-import { formStyles } from "@/lib/styles";
+import { useMemo } from "react";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -25,12 +23,11 @@ ChartJS.register(
   Title
 );
 
-interface FinancialChartsProps {
+interface BarChartProps {
   transactions: Transaction[];
 }
 
-export function FinancialCharts({ transactions }: FinancialChartsProps) {
-  // Calcular datos para los gráficos
+export const BarChart = ({ transactions }: BarChartProps) => {
   const chartData = useMemo(() => {
     // Objeto para almacenar gastos por categoría
     const expensesByCategory: Record<string, number> = {};
@@ -156,14 +153,5 @@ export function FinancialCharts({ transactions }: FinancialChartsProps) {
     },
   };
 
-  return (
-    <div className={formStyles.container}>
-      <h2 className={formStyles.text.title}>Gráficos financieros</h2>
-      <div>
-        <div className="h-64">
-          <Bar data={chartData.barData} options={barOptions} />
-        </div>
-      </div>
-    </div>
-  );
-}
+  return <Bar data={chartData.barData} options={barOptions} />;
+};
