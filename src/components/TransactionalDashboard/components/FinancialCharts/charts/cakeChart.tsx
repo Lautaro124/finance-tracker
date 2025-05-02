@@ -51,12 +51,18 @@ export const CakeChart = ({ transactions, categories }: CakeChartProps) => {
     const data = Object.values(categoryAmounts);
 
     // Generar colores aleatorios para cada categoría
-    const backgroundColors = labels.map(
-      () =>
-        `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-          Math.random() * 256
-        )}, ${Math.floor(Math.random() * 256)}, 0.7)`
-    );
+    const backgroundColors = [
+      "#3366CC",
+      "#DC3912",
+      "#FF9900",
+      "#109618",
+      "#990099",
+      "#0099C6",
+      "#DD4477",
+      "#66AA00",
+      "#B82E2E",
+      "#316395",
+    ];
 
     return {
       labels,
@@ -91,7 +97,6 @@ export const CakeChart = ({ transactions, categories }: CakeChartProps) => {
           },
         },
       },
-     
     },
   };
 
