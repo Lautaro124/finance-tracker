@@ -39,6 +39,7 @@ export const BarChart = ({ transactions }: BarChartProps) => {
     const today = new Date();
     for (let i = 5; i >= 0; i--) {
       const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      // El constructor por componentes no necesita ajuste de zona horaria
       const monthKey = month.toLocaleDateString("es-AR", {
         month: "short",
         year: "numeric",
@@ -50,6 +51,10 @@ export const BarChart = ({ transactions }: BarChartProps) => {
     transactions.forEach((transaction) => {
       const amount = Number(transaction.amount);
       const date = new Date(transaction.date);
+      // Ajustar la fecha para compensar el efecto de la zona horaria
+      const adjustedDate = new Date(
+        date.getTime() + date.getTimezoneOffset() * 60000
+      );
 
       // Para el gráfico de categorías (solo gastos)
       if (amount < 0) {
@@ -60,7 +65,7 @@ export const BarChart = ({ transactions }: BarChartProps) => {
       }
 
       // Para el gráfico mensual
-      const monthKey = date.toLocaleDateString("es-AR", {
+      const monthKey = adjustedDate.toLocaleDateString("es-AR", {
         month: "short",
         year: "numeric",
       });

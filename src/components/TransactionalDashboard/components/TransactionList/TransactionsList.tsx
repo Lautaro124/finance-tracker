@@ -24,9 +24,15 @@ export function TransactionsList({
       maximumFractionDigits: 0,
     }).format(amount);
   };
-
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-AR", {
+    // Aseguramos que la fecha se interprete correctamente ajustando la zona horaria
+    const date = new Date(dateString);
+    // Ajustamos la fecha para compensar la zona horaria
+    const adjustedDate = new Date(
+      date.getTime() + date.getTimezoneOffset() * 60000
+    );
+
+    return adjustedDate.toLocaleDateString("es-AR", {
       year: "numeric",
       month: "short",
       day: "numeric",
